@@ -1,0 +1,65 @@
+server:
+  port: 8083
+
+topic:
+  notification: notification.commands
+
+camunda:
+  bpm:
+    enabled: true
+    history-level: activity
+    admin-user:
+      id: admin
+      password: admin
+    database:
+      schema-update: true
+      type: postgres
+spring:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:8000/order
+    username: order
+    password: 1234
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        acks: 1
+  cloud:
+    openfeign:
+      oauth2:
+        enabled: true
+        clientRegistrationId: keycloak
+      client:
+        config:
+          products:
+            url: http://localhost:8081
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: orders
+            client-secret: ruK5LzTFNHCwHlLcH5CKjVlSLJCH0B3h
+            authorization-grant-type: client_credentials
+            provider: keycloak
+        provider:
+          keycloak:
+            token-uri: http://localhost:8080/realms/service-storage/protocol/openid-connect/token
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/service-storage
+    jwt:
+      secret_key: 4eeab38d706831be4b36612ead768ef8182d1dd6f0e14e5dc934652e297fb16a
+      access_token_expiration: 36000000
+      refresh_token_expiration: 252000000
+
+keycloak:
+  auth-server-url: http://localhost:8080
+  realm: service-storage
+  resource: orders
+  public-client: true
+  use-resource-role-mappings: true

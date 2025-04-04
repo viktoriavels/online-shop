@@ -1,0 +1,37 @@
+server:
+  port: 8082
+spring:
+  autoconfigure:
+    exclude:
+      org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud:
+    function:
+      definition: consumeNotificationCommands;
+    stream:
+      kafka:
+        binder:
+          brokers: localhost:9092
+          auto-create-topics: true
+        configuration:
+          security:
+            protocol: PLAINTEXT
+      bindings:
+        consumeNotificationCommands-in-0:
+          destination: notification.commands
+          contentType: application/json
+          group: notification-group
+          useNativeDecoding: true
+          consumer:
+            autoCommitOffset: false
+            startOffset: latest
+            ackMode: RECORD
+            maxAttempts: 1
+            enableDlq: false
+  mail:
+    host: smtp.your-email-provider.com
+    port: 587
+    username: your-email@example.com
+    password: your-email-password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
